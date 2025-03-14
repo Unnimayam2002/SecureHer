@@ -9,7 +9,6 @@ import { jwtDecode } from "jwt-decode";
 import { login } from "../redux/Userslice";
 import { useNavigate } from "react-router-dom";
 
-
 const validationSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
@@ -27,28 +26,27 @@ async function loginUser(credentials) {
 
 export default function Login() {
   const { mutateAsync, isLoading, isError, error } = useMutation({
-    mutationFn:loginAPI,
-    mutationKey:["Userlogin"]
+    mutationFn: loginAPI,
+    mutationKey: ["Userlogin"],
   });
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
- },
+    },
     validationSchema,
     onSubmit: async (values) => {
-      mutateAsync(values).then((data)=>{
-        // console.log(data);
-        dispatchEvent(login(data)) 
-        localStorage.setItem("userData",data)
-        navigate('/homepage')
-      })
+      mutateAsync(values).then((data) => {
+        dispatch(login(data));
+        localStorage.setItem("userData", data);
+        navigate('/homepage');
+      });
     }
-});
+  });
 
   return (
     <div
@@ -118,7 +116,7 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition duration-300 shadow-md text-lg"
+              className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition duration-300 shadow-md text-lg cursor-pointer"
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}

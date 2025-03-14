@@ -80,7 +80,7 @@ const Coms = () => {
           </div>
           <button
             type="submit"
-            className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-lg hover:bg-blue-700"
+            className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-lg hover:bg-blue-700 cursor-pointer"
           >
             Request Support
           </button>

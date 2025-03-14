@@ -3,6 +3,7 @@ import {
   FaUsers, FaBell, FaBook, FaRoute, 
   FaExclamationTriangle, FaChartBar, FaChevronDown, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaPlusCircle, FaEye
 } from "react-icons/fa";
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const dashboardStats = [
   { title: "Total Users", count: 1245, icon: <FaUsers className="text-blue-500 text-3xl" /> },
@@ -10,8 +11,25 @@ const dashboardStats = [
   { title: "Educational Resources", count: 25, icon: <FaBook className="text-purple-500 text-3xl" /> },
   { title: "Safe Routes Reviewed", count: 142, icon: <FaRoute className="text-green-500 text-3xl" /> },
   { title: "Anonymous Reports", count: 31, icon: <FaExclamationTriangle className="text-yellow-500 text-3xl" /> },
-  { title: "Monthly Analytics", count: "View Report", icon: <FaChartBar className="text-indigo-500 text-3xl" /> },
 ];
+
+const barChartData = [
+  { name: 'Users', value: 1245 },
+  { name: 'Alerts', value: 68 },
+  { name: 'Resources', value: 25 },
+  { name: 'Routes', value: 142 },
+  { name: 'Reports', value: 31 }
+];
+
+const pieChartData = [
+  { name: 'Users', value: 1245 },
+  { name: 'Alerts', value: 68 },
+  { name: 'Resources', value: 25 },
+  { name: 'Routes', value: 142 },
+  { name: 'Reports', value: 31 }
+];
+
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f50', '#ff69b4'];
 
 const Admindashboard = () => {
   const [isEduresOpen, setIsEduresOpen] = useState(false);
@@ -64,6 +82,37 @@ const Admindashboard = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+            <div className="bg-white shadow-md p-6 rounded-lg">
+              <h2 className="text-lg font-bold mb-4">Bar Chart Report</h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barChartData}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-white shadow-md p-6 rounded-lg">
+              <h2 className="text-lg font-bold mb-4">Pie Chart Report</h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#82ca9d" label>
+                    {pieChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </main>
       </div>

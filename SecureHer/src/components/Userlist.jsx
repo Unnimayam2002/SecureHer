@@ -4,9 +4,9 @@ import {
 } from "react-icons/fa";
 
 const initialUsers = [
-  { id: 1, name: "Alice Johnson", district: "Downtown", location: "New York" },
-  { id: 2, name: "Bob Smith", district: "Westside", location: "Los Angeles" },
-  { id: 3, name: "Charlie Brown", district: "Uptown", location: "Chicago" }
+  { id: 1, name: "Alice Johnson", district: "Downtown", location: "New York", email: "alice.johnson@example.com", phone: "123-456-7890" },
+  { id: 2, name: "Bob Smith", district: "Westside", location: "Los Angeles", email: "bob.smith@example.com", phone: "987-654-3210" },
+  { id: 3, name: "Charlie Brown", district: "Uptown", location: "Chicago", email: "charlie.brown@example.com", phone: "555-555-5555" }
 ];
 
 const Userlist = () => {
@@ -15,17 +15,8 @@ const Userlist = () => {
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
 
-  const handleEdit = (id) => {
-    const updatedUsers = users.map((user) => {
-      if (user.id === id) {
-        const newName = prompt("Edit name:", user.name);
-        const newDistrict = prompt("Edit district:", user.district);
-        const newLocation = prompt("Edit location:", user.location);
-        return { ...user, name: newName || user.name, district: newDistrict || user.district, location: newLocation || user.location };
-      }
-      return user;
-    });
-    setUsers(updatedUsers);
+  const handleVerify = (id) => {
+    alert(`User with ID ${id} has been verified.`);
   };
 
   const handleDelete = (id) => {
@@ -67,13 +58,15 @@ const Userlist = () => {
       {/* Users Table */}
       <div className="flex-1 p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Users List</h1>
-        <div className="bg-white shadow-lg rounded-2xl overflow-hidden  ">
+        <div className="bg-white shadow-lg rounded-2xl overflow-hidden">
           <table className="min-w-full">
             <thead className="bg-gradient-to-r from-gray-900 to-gray-700 text-white">
               <tr>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">Name</th>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">District</th>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">Location</th>
+                <th className="py-3 px-6 text-left uppercase tracking-wider">Email</th>
+                <th className="py-3 px-6 text-left uppercase tracking-wider">Phone</th>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -83,12 +76,14 @@ const Userlist = () => {
                   <td className="py-3 px-6 font-medium text-gray-800">{user.name}</td>
                   <td className="py-3 px-6 text-gray-700">{user.district}</td>
                   <td className="py-3 px-6 text-gray-700">{user.location}</td>
+                  <td className="py-3 px-6 text-gray-700">{user.email}</td>
+                  <td className="py-3 px-6 text-gray-700">{user.phone}</td>
                   <td className="py-3 px-6 flex space-x-2">
                     <button
-                      onClick={() => handleEdit(user.id)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transform transition duration-200 hover:scale-105"
+                      onClick={() => handleVerify(user.id)}
+                      className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transform transition duration-200 hover:scale-105"
                     >
-                      Edit
+                      Verify
                     </button>
                     <button
                       onClick={() => handleDelete(user.id)}

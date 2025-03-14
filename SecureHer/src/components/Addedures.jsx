@@ -5,20 +5,24 @@ const Addedures = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [resourceType, setResourceType] = useState('article');
-  const [link, setLink] = useState('');
+  const [file, setFile] = useState(null);
   const [isEduresOpen, setIsEduresOpen] = useState(false);
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newResource = { title, description, resourceType, link };
+    if (!file) {
+      alert('Please upload a file');
+      return;
+    }
+    const newResource = { title, description, resourceType, fileName: file.name };
     console.log('Resource added:', newResource);
     alert('Educational resource added successfully!');
     setTitle('');
     setDescription('');
     setResourceType('article');
-    setLink('');
+    setFile(null);
   };
 
   return (
@@ -72,8 +76,8 @@ const Addedures = () => {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2">Link</label>
-            <input type="url" value={link} onChange={(e) => setLink(e.target.value)} placeholder="Enter resource link" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200" required />
+            <label className="block text-gray-700 font-bold mb-2">Upload File</label>
+            <input type="file" onChange={(e) => setFile(e.target.files[0])} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200" required />
           </div>
           <button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-transform transform hover:scale-110 w-full">Add Resource</button>
         </form>

@@ -6,7 +6,7 @@ import {
 const distressSignals = [
   { id: 1, helper: "Alice Johnson", victim: "Emma White", district: "Downtown", location: "New York", status: "Active" },
   { id: 2, helper: "Bob Smith", victim: "Olivia Green", district: "Westside", location: "Los Angeles", status: "Resolved" },
-  { id: 3, helper: "Charlie Brown", victim: "Sophia Blue", district: "Uptown", location: "Chicago", status: "Pending" }
+  { id: 3, helper: "Charlie Brown", victim: "Sophia Blue", district: "Uptown", location: "Chicago", status: "Resolved" }
 ];
 
 const Signallist = () => {

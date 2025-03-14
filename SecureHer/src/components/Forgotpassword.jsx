@@ -21,8 +21,12 @@ function Forgotpassword() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6 bg-cover bg-center">
-      <div className="bg-white/20 rounded-xl shadow-2xl backdrop-blur-xl w-full max-w-lg p-12">
+    <div 
+      className="flex min-h-screen items-center justify-center p-6 bg-cover bg-center" 
+      style={{ backgroundColor: '#E0F7FA' }} // Light blue background
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-12"> 
+        {/* White form background with smooth rounded corners */}
         <h2 className="text-4xl font-bold text-center text-gray-900 mb-8">Forgot Password?</h2>
         <p className="text-center text-gray-800 mb-6">
           Enter your email address and we’ll send you a link to reset your password.
@@ -36,7 +40,7 @@ function Forgotpassword() {
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full p-4 mt-2 bg-white/40 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-purple-300"
+              className="w-full p-4 mt-2 bg-gray-100 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-purple-300"
               placeholder="Enter your email"
             />
             {formik.touched.email && formik.errors.email && (
@@ -45,7 +49,7 @@ function Forgotpassword() {
           </div>
           <button
             type="submit"
-            className="w-full bg-purple-600 text-white py-4 rounded-lg hover:bg-purple-700 transition duration-300 shadow-lg text-xl"
+            className="w-full bg-purple-600 text-white py-4 rounded-lg hover:bg-purple-700 transition duration-300 shadow-lg text-xl cursor-pointer"
           >
             Send Reset Link
           </button>

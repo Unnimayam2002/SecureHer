@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const Communitysupport = () => {
   const [requests, setRequests] = useState([
@@ -27,11 +25,13 @@ const Communitysupport = () => {
               <li key={request.id} className="p-4 bg-gray-100 rounded-lg shadow-md">
                 <p className="text-lg font-semibold">{request.name} - {request.location}</p>
                 <p className="text-gray-700">🆘 {request.need}</p>
-                <p className={`text-sm ${request.status === 'Open' ? 'text-green-600' : 'text-yellow-600'}`}>Status: {request.status}</p>
+                <p className={`text-sm ${request.status === 'Open' ? 'text-green-600' : 'text-yellow-600'}`}>
+                  Status: {request.status}
+                </p>
                 {request.status === 'Open' && (
                   <button
                     onClick={() => handleSupport(request.id)}
-                    className="mt-3 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
+                    className="mt-3 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 cursor-pointer"
                   >
                     Offer Support
                   </button>
@@ -48,4 +48,3 @@ const Communitysupport = () => {
 };
 
 export default Communitysupport;
-

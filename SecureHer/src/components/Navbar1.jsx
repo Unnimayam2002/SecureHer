@@ -58,9 +58,9 @@ const Navbar1 = ({ sendDistressSignal, isSending, distressNotification }) => {
               </div>
               {isServicesOpen && (
                 <div className="absolute bg-white text-gray-900 rounded-lg shadow-lg mt-2 w-56">
-                  <a href="/rtloc" className="block px-4 py-2 hover:bg-blue-100">Real-Time Location Tracking</a>
-                  <a href="/comsview" className="block px-4 py-2 hover:bg-blue-100">Request Community Support</a>
-                  <a href="/anorep" className="block px-4 py-2 hover:bg-blue-100">Anonymous Reporting</a>
+                  <a href="/rtloc" className="block px-4 py-2 hover:bg-blue-100">Location Tracking</a>
+                  <a href="/comsview" className="block px-4 py-2 hover:bg-blue-100">Community Support</a>
+                  <a href="/anorep" className="block px-4 py-2 hover:bg-blue-100">Incident Reporting</a>
                 </div>
               )}
             </div>
@@ -76,20 +76,20 @@ const Navbar1 = ({ sendDistressSignal, isSending, distressNotification }) => {
               </div>
               {isViewsOpen && (
                 <div className="absolute bg-white text-gray-900 rounded-lg shadow-lg mt-2 w-56">
-                  <a href="/coms" className="block px-4 py-2 hover:bg-blue-100">Community Support</a>
+                  <a href="/coms" className="block px-4 py-2 hover:bg-blue-100">Offer Support</a>
                   <a href="/anorepview" className="block px-4 py-2 hover:bg-blue-100">Reports</a>
                   <a href="/edures" className="block px-4 py-2 hover:bg-blue-100">Educational Resources</a>
                   <a href="/saferoutes" className="block px-4 py-2 hover:bg-blue-100">Safe Routes</a>
                 </div>
               )}
             </div>
-            <a href="/cusset" className="text-white hover:text-blue-400">Customizable Settings</a>
+            <a href="/cusset" className="text-white hover:text-blue-400">Settings</a>
           </nav>
           <div className="hidden md:flex items-center space-x-4">
             <button
               onClick={sendDistressSignal}
               disabled={isSending}
-              className={`px-5 py-2 rounded-lg font-semibold shadow-md ${isSending ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'}`}
+              className={`px-5 py-2 rounded-lg font-semibold shadow-md ${isSending ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700 cursor-pointer'}`}
             >
               {isSending ? 'Sending...' : '🚨 Distress Signal'}
             </button>

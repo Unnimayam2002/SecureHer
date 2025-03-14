@@ -9,9 +9,16 @@ const initialReports = [
 
 const Reportslist = () => {
   const [reports, setReports] = useState(initialReports);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isEduresOpen, setIsEduresOpen] = useState(false);
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
+
+  const filteredReports = reports.filter(report =>
+    report.reportType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    report.district.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    report.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen flex bg-gray-100">
@@ -46,15 +53,26 @@ const Reportslist = () => {
       {/* Reports Section */}
       <div className="flex-1 p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Incident Reports</h1>
+        <input
+          type="text"
+          placeholder="Search by incident type, district, or location..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-2 mb-6 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200"
+        />
         <div className="space-y-4">
-          {reports.map((report) => (
-            <div key={report.id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
-              <h2 className="text-xl font-semibold text-gray-700">{report.reportType} reported by {report.reporter}</h2>
-              <p className="text-gray-700">Incident Details: {report.incidentDetails}</p>
-              <p className="text-gray-700">District: {report.district}</p>
-              <p className="text-gray-700">Location: {report.location}</p>
-            </div>
-          ))}
+          {filteredReports.length > 0 ? (
+            filteredReports.map((report) => (
+              <div key={report.id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
+                <h2 className="text-xl font-semibold text-gray-700">{report.reportType} reported by {report.reporter}</h2>
+                <p className="text-gray-700">Incident Details: {report.incidentDetails}</p>
+                <p className="text-gray-700">District: {report.district}</p>
+                <p className="text-gray-700">Location: {report.location}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-700 text-center">No incidents found.</p>
+          )}
         </div>
       </div>
     </div>

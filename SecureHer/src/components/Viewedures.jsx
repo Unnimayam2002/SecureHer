@@ -66,7 +66,7 @@ const Viewedures = () => {
       {/* View Resources Section */}
       <div className="flex-1 p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Educational Resources</h1>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {resources.map((resource) => (
             <div key={resource.id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
               <h2 className="text-xl font-semibold text-gray-700">{resource.title}</h2>

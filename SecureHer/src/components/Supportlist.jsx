@@ -6,7 +6,7 @@ import {
 const initialSupportRequests = [
   { id: 1, helper: "Alice Johnson", requester: "Jane Doe", district: "Downtown", location: "New York", supportType: "Medical Aid", supportDetails: "Needs immediate first aid and transport to hospital", status: "In Progress" },
   { id: 2, helper: "Bob Smith", requester: "Mike Ross", district: "Westside", location: "Los Angeles", supportType: "Legal Assistance", supportDetails: "Requires legal advice for domestic issues", status: "Completed" },
-  { id: 3, helper: "Charlie Brown", requester: "Sarah Lee", district: "Uptown", location: "Chicago", supportType: "Counseling", supportDetails: "Seeks emotional support and counseling", status: "Pending" }
+  { id: 3, helper: "Charlie Brown", requester: "Sarah Lee", district: "Uptown", location: "Chicago", supportType: "Counseling", supportDetails: "Seeks emotional support and counseling", status: "In Progress" }
 ];
 
 const Supportlist = () => {
@@ -48,7 +48,7 @@ const Supportlist = () => {
       {/* Support Requests */}
       <div className="flex-1 p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Community Support Requests</h1>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {supportRequests.map((request) => (
             <div key={request.id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
               <p className="text-xl font-semibold text-gray-700">Name: {request.requester}</p>
