@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, FaPlusCircle, FaEye
+  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, FaPlusCircle, FaEye, FaSignOutAlt
 } from "react-icons/fa";
 
 const initialSupportRequests = [
@@ -14,6 +14,10 @@ const Supportlist = () => {
   const [isEduresOpen, setIsEduresOpen] = useState(false);
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
+
+  const handleLogout = () => {
+    window.location.href = '/';
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -40,6 +44,11 @@ const Supportlist = () => {
                   <li><a href="/admin/viewedures" className="flex items-center space-x-2 hover:text-blue-400"><FaEye /> <span>View Resources</span></a></li>
                 </ul>
               )}
+            </li>
+            <li>
+              <button onClick={handleLogout} className="flex items-center space-x-2 text-white-400 hover:text-white-600 w-full cursor-pointer">
+                <FaSignOutAlt /> <span>Logout</span>
+              </button>
             </li>
           </ul>
         </nav>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaBars, FaBell } from "react-icons/fa";
 
-const Navbar1 = ({ sendDistressSignal, isSending, distressNotification }) => {
+const Navbar1 = ({ sendDistressSignal, isSending, distressNotification, handleLogout }) => {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isViewsOpen, setIsViewsOpen] = useState(false);
   const servicesRef = useRef(null);
@@ -84,6 +84,7 @@ const Navbar1 = ({ sendDistressSignal, isSending, distressNotification }) => {
               )}
             </div>
             <a href="/cusset" className="text-white hover:text-blue-400">Settings</a>
+            <button onClick={handleLogout} className="text-white hover:text-red-400 cursor-pointer">Logout</button>
           </nav>
           <div className="hidden md:flex items-center space-x-4">
             <button
@@ -154,9 +155,14 @@ const Distresssignal = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  };
+
   return (
     <div>
-      <Navbar1 sendDistressSignal={sendDistressSignal} isSending={isSending} distressNotification={distressNotification} />
+      <Navbar1 sendDistressSignal={sendDistressSignal} isSending={isSending} distressNotification={distressNotification} handleLogout={handleLogout} />
     </div>
   );
 };

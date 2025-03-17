@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { 
   FaUsers, FaBell, FaBook, FaRoute, 
-  FaExclamationTriangle, FaChartBar, FaChevronDown, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaPlusCircle, FaEye
+  FaExclamationTriangle, FaChartBar, FaChevronDown, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaPlusCircle, FaEye, FaSignOutAlt
 } from "react-icons/fa";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -36,6 +36,11 @@ const Admindashboard = () => {
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
 
+  const handleLogout = () => {
+    console.log("Logging out...");
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <div className="flex flex-1">
@@ -53,7 +58,7 @@ const Admindashboard = () => {
               <li><a href="/admin/supportlist" className="flex items-center space-x-2 hover:text-blue-400"><FaHandsHelping /> <span>Community Support</span></a></li>
               <li><a href="/admin/reportslist" className="flex items-center space-x-2 hover:text-blue-400"><FaFileAlt /> <span>Reports</span></a></li>
               <li>
-                <div onClick={toggleEdures} className="flex items-center space-x-2 cursor-pointer hover:text-blue-400">
+                <div onClick={toggleEdures} className={`flex items-center space-x-2 cursor-pointer hover:text-blue-400`}>
                   <FaBook /> <span>Educational Resources</span> <FaChevronDown className={`${isEduresOpen ? 'rotate-180' : ''} transition-transform`} />
                 </div>
                 {isEduresOpen && (
@@ -62,6 +67,11 @@ const Admindashboard = () => {
                     <li><a href="/admin/viewedures" className="flex items-center space-x-2 hover:text-blue-400"><FaEye /> <span>View Resources</span></a></li>
                   </ul>
                 )}
+              </li>
+              <li>
+                <div onClick={handleLogout} className="flex items-center space-x-2 text-white hover:text-gray-400 cursor-pointer">
+                  <FaSignOutAlt /> <span>Logout</span>
+                </div>
               </li>
             </ul>
           </nav>

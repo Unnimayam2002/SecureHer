@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Footer = () => {
+const Footer1 = () => {
   return (
     <footer className="bg-gray-900 text-white py-10">
       <div className="container mx-auto px-6">
@@ -11,9 +11,9 @@ const Footer = () => {
           <div>
             <h2 className="text-lg font-bold mb-4">QUICK LINKS</h2>
             <ul className="space-y-2">
-              <li><a href="/" className="hover:text-gray-400">Home</a></li>
-              <li><a href="/about" className="hover:text-gray-400">About</a></li>
-              <li><a href="/services" className="hover:text-gray-400">Services</a></li>
+              <li><a href="/homepage" className="hover:text-gray-400">Home</a></li>
+              <li><a href="/about1" className="hover:text-gray-400">About</a></li>
+              <li><a href="/services1" className="hover:text-gray-400">Services</a></li>
             </ul>
           </div>
 
@@ -47,4 +47,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default Footer1;

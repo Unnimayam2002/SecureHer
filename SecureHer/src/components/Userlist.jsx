@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, FaPlusCircle, FaEye 
+  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, FaPlusCircle, FaEye, FaSignOutAlt
 } from "react-icons/fa";
 
 const initialUsers = [
@@ -23,6 +23,11 @@ const Userlist = () => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       setUsers(users.filter(user => user.id !== id));
     }
+  };
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+    window.location.href = "/";
   };
 
   return (
@@ -50,6 +55,11 @@ const Userlist = () => {
                   <li><a href="/admin/viewedures" className="flex items-center space-x-2 hover:text-blue-400"><FaEye /> <span>View Resources</span></a></li>
                 </ul>
               )}
+            </li>
+            <li>
+              <div onClick={handleLogout} className="flex items-center space-x-2 text-white hover:text-gray-400 cursor-pointer">
+                <FaSignOutAlt /> <span>Logout</span>
+              </div>
             </li>
           </ul>
         </nav>

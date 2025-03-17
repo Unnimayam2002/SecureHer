@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Importing Link for navigation
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
-const CustomizableSettings = () => {
+const Customizablesettings = () => {
   const [emergencyContacts, setEmergencyContacts] = useState(['']);
   const [settings, setSettings] = useState({
     notifications: true,
     privacyMode: false,
   });
+  const [policeStation, setPoliceStation] = useState('Fetching nearest police station...');
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(`https://api.example.com/nearest-police?lat=${latitude}&lng=${longitude}`);
+          const data = await response.json();
+          setPoliceStation(data.name || 'Police station not found');
+        } catch (error) {
+          setPoliceStation('Unable to fetch police station');
+        }
+      });
+    } else {
+      setPoliceStation('Geolocation not supported');
+    }
+  }, []);
 
   const handleContactChange = (index, value) => {
     const updatedContacts = [...emergencyContacts];
@@ -31,13 +49,12 @@ const CustomizableSettings = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Settings Saved:', { ...settings, emergencyContacts });
+    console.log('Settings Saved:', { ...settings, emergencyContacts, policeStation });
     alert('✅ Settings updated successfully!');
   };
 
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col items-center py-10">
-      <h2 className="text-4xl font-extrabold text-blue-800 mb-8"></h2>
       <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-2xl">
         {/* Emergency Contacts Section */}
         <div className="mb-8">
@@ -69,6 +86,17 @@ const CustomizableSettings = () => {
           >
             ➕ Add Contact
           </button>
+        </div>
+
+        {/* Nearest Police Station */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-semibold text-gray-700 mb-4">🚓 Nearest Police Station</h3>
+          <input
+            type="text"
+            value={policeStation}
+            readOnly
+            className="w-full p-3 border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-700"
+          />
         </div>
 
         {/* Notification and Privacy Settings */}
@@ -115,4 +143,4 @@ const CustomizableSettings = () => {
   );
 };
 
-export default CustomizableSettings;
+export default Customizablesettings;

@@ -2,7 +2,7 @@ import React from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 
-const Banner = () => {
+const Banner1 = () => {
   const slides = [
     {
       title: "ENSURING WOMEN'S SAFETY EVERYWHERE",
@@ -22,7 +22,7 @@ const Banner = () => {
     <div
       className="py-50"
       style={{
-        backgroundImage: "url('/images/women-bg.jpg')", // Replace with your image URL
+        backgroundImage: "url('/images/womens-bg.jpeg')", // Replace with your image URL
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -38,7 +38,7 @@ const Banner = () => {
         >
           {slides.map((slide, index) => (
             <div key={index} className="text-center py-16">
-              <h1 className="text-5xl font-extrabold mb-6 tracking-wide text-red-400">
+              <h1 className="text-5xl font-extrabold mb-6 tracking-wide text-blue-950">
                 {slide.title}
               </h1>
               <p className="text-xl mb-8 max-w-4xl mx-auto leading-relaxed text-red-1000">
@@ -52,4 +52,4 @@ const Banner = () => {
   );
 };
 
-export default Banner;
+export default Banner1;

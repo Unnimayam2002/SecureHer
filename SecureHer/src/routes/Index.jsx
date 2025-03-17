@@ -32,6 +32,8 @@ import Addedurespage from '../pages/Addedurespage';
 import Viewedurespage from '../pages/Viewedurespage';
 import Notificationpage from '../pages/Notificationpage';
 import Userprofilepage from '../pages/Userprofilepage';
+import Footer1page from '../pages/Footer1page';
+import Banner1page from '../pages/Banner1page';
 
 
 function Index() {
@@ -44,16 +46,17 @@ function Index() {
   return (
       <BrowserRouter>
           <Routes> 
-                  <Route path='/homepage' element={<><Navbar1 /><Homepage1 /><Footerpage/></>}/>
+                  <Route path='/homepage' element={<><Navbar1 /><Homepage1 /><Footer1page/></>}/>
                   <Route path='/' element={<><Navbar /><Homepage /><Footerpage /></>} />
                   <Route path='/about' element={<><Navbar /><About /><Footerpage /></>} />
-                  <Route path='/about1' element={<><Navbar1 /><About1page /><Footerpage /></>} />
-                  <Route path='/services1' element={<><Navbar1 /><Services1page /><Footerpage /></>} />
+                  <Route path='/about1' element={<><Navbar1 /><About1page /><Footer1page /></>} />
+                  <Route path='/services1' element={<><Navbar1 /><Services1page /><Footer1page /></>} />
                   <Route path='/projects' element={<><Navbar /><Projects /><Footerpage /></>} />
                   <Route path='/services' element={<><Navbar /><Services /><Footerpage /></>} />
                   <Route path='/login' element={<><Navbar /><Loginpage /><Footerpage /></>} />
                   <Route path='/forgot-password' element={<><Navbar /><Forgotpasswordpage /><Footerpage /></>} />
                   <Route path='/banner' element={<Bannerpage />} />
+                  <Route path='/banner1' element={<Banner1page />} />
                   <Route path='/signup' element={<><Navbar /><Signuppage /><Footerpage /></>} />
                   <Route path='/rtloc' element={<><Navbar1 /><Realtimelocationpage /><Footerpage /></>} />
                   <Route path='/coms' element={<><Navbar1 /><Communitysupportpage /><Footerpage /></>} />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChartBar, FaChevronDown, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaPlusCircle, FaEye } from "react-icons/fa";
+import { FaChartBar, FaChevronDown, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaPlusCircle, FaEye, FaSignOutAlt } from "react-icons/fa";
 
 const initialReports = [
   { id: 1, reporter: "Anonymous", reportType: "Harassment", incidentDetails: "Verbal harassment reported near central park", district: "Downtown", location: "New York" },
@@ -13,6 +13,10 @@ const Reportslist = () => {
   const [isEduresOpen, setIsEduresOpen] = useState(false);
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
+
+  const handleLogout = () => {
+    window.location.href = '/';
+  };
 
   const filteredReports = reports.filter(report =>
     report.reportType.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -30,21 +34,26 @@ const Reportslist = () => {
         </div>
         <nav>
           <ul className="space-y-6 text-md">
-            <li><a href="/admin/admin-dashboard" className="flex items-center space-x-2 hover:text-blue-400"><FaChartBar /> <span>Dashboard</span></a></li>
-            <li><a href="/admin/userlist" className="flex items-center space-x-2 hover:text-blue-400"><FaUser /> <span>Users</span></a></li>
-            <li><a href="/admin/signallist" className="flex items-center space-x-2 hover:text-blue-400"><FaSignal /> <span>Distress Signals</span></a></li>
-            <li><a href="/admin/supportlist" className="flex items-center space-x-2 hover:text-blue-400"><FaHandsHelping /> <span>Community Support</span></a></li>
-            <li><a href="/admin/reportslist" className="flex items-center space-x-2 hover:text-blue-400"><FaFileAlt /> <span>Reports</span></a></li>
+            <li><a href="/admin/admin-dashboard" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaChartBar /> <span>Dashboard</span></a></li>
+            <li><a href="/admin/userlist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaUser /> <span>Users</span></a></li>
+            <li><a href="/admin/signallist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaSignal /> <span>Distress Signals</span></a></li>
+            <li><a href="/admin/supportlist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaHandsHelping /> <span>Community Support</span></a></li>
+            <li><a href="/admin/reportslist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaFileAlt /> <span>Reports</span></a></li>
             <li>
               <div onClick={toggleEdures} className="flex items-center space-x-2 cursor-pointer hover:text-blue-400">
                 <FaBook /> <span>Educational Resources</span> <FaChevronDown className={`${isEduresOpen ? 'rotate-180' : ''} transition-transform`} />
               </div>
               {isEduresOpen && (
                 <ul className="pl-6 space-y-4">
-                  <li><a href="/admin/addedures" className="flex items-center space-x-2 hover:text-blue-400"><FaPlusCircle /> <span>Add Resource</span></a></li>
-                  <li><a href="/admin/viewedures" className="flex items-center space-x-2 hover:text-blue-400"><FaEye /> <span>View Resources</span></a></li>
+                  <li><a href="/admin/addedures" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaPlusCircle /> <span>Add Resource</span></a></li>
+                  <li><a href="/admin/viewedures" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaEye /> <span>View Resources</span></a></li>
                 </ul>
               )}
+            </li>
+            <li>
+              <button onClick={handleLogout} className="flex items-center space-x-2 text-white-400 hover:text-white-600 w-full cursor-pointer">
+                <FaSignOutAlt /> <span>Logout</span>
+              </button>
             </li>
           </ul>
         </nav>
