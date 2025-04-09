@@ -6,8 +6,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { loginAPI } from "../services/userServices";
 import { jwtDecode } from "jwt-decode";
-import { login } from "../redux/Userslice";
 import { useNavigate } from "react-router-dom";
+import { loginUserAction } from "../redux/Userslice";
+import { useState } from "react";
 
 const validationSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -32,6 +33,7 @@ export default function Login() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false); 
 
   const formik = useFormik({
     initialValues: {
@@ -40,13 +42,19 @@ export default function Login() {
     },
     validationSchema,
     onSubmit: async (values) => {
-      mutateAsync(values).then((data) => {
-        dispatch(login(data));
-        localStorage.setItem("userData", data);
-        navigate('/homepage');
-      });
+      const token = await mutateAsync(values);   
+      sessionStorage.setItem("userToken", token);
+      const decodedData = jwtDecode(token);
+      dispatch(loginUserAction(decodedData));
+        if(decodedData.name === "Admin"){
+          navigate('/admin/admin-dashboard')
+        }
+        else{
+          navigate('/homepage');
+        }
+      }
     }
-  });
+  )
 
   return (
     <div
@@ -91,7 +99,7 @@ export default function Login() {
               <div className="relative flex items-center">
                 <FaLock className="absolute left-3 text-gray-600" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   value={formik.values.password}
@@ -126,7 +134,7 @@ export default function Login() {
           <p className="text-center text-gray-900 mt-5">
             Don't have an account?{' '}
             <a
-              href="/Signup"
+              href="/signup"
               className="text-purple-800 font-semibold hover:underline"
             >
               Sign up
@@ -135,5 +143,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
+ );
 }

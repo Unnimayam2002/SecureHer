@@ -1,34 +1,59 @@
-import React from 'react'
-import { useState } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { viewResAPI } from '../services/resourcesServices';
 
 const Educationalresources = () => {
-  const [resources] = useState([
-    { id: 1, title: 'Self-Defense Techniques', type: 'Article', link: 'https://example.com/self-defense' },
-    { id: 2, title: 'Know Your Legal Rights', type: 'Video', link: 'https://example.com/legal-rights' },
-    { id: 3, title: 'Emergency Safety Tips', type: 'Tutorial', link: 'https://example.com/safety-tips' }
-  ]);
+  const { data: resources = [], isLoading, isError, error } = useQuery({
+    queryKey: ['educationalResources'],
+    queryFn: viewResAPI,
+  });
 
   return (
     <div className="min-h-screen bg-green-50 flex flex-col items-center py-10">
       <h2 className="text-3xl font-bold text-green-800 mb-6">📚 Educational Resources</h2>
-      <div className="w-3/4 bg-white p-6 rounded-2xl shadow-lg">
-        {resources.length > 0 ? (
-          <ul className="space-y-4">
+      <div className="w-11/12 md:w-3/4 bg-white p-6 rounded-2xl shadow-lg">
+        {isLoading ? (
+          <p className="text-lg text-gray-600">Loading resources...</p>
+        ) : isError ? (
+          <p className="text-lg text-red-600">Error: {error.message}</p>
+        ) : resources.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {resources.map((resource) => (
-              <li key={resource.id} className="p-4 bg-gray-100 rounded-lg shadow-md">
-                <p className="text-lg font-semibold">{resource.title}</p>
-                <p className="text-gray-700">📝 Type: {resource.type}</p>
+              <div
+                key={resource._id}
+                className="bg-gray-100 p-4 rounded-xl shadow-md hover:shadow-lg transition duration-300"
+              >
+                <h3 className="text-xl font-semibold text-green-800 mb-2">{resource.title}</h3>
+                {resource.description && (
+                  <p className="text-gray-700 mb-2">{resource.description}</p>
+                )}
+                <p className="text-sm text-gray-600 mb-2">📝 Type: {resource.type || resource.resourceType}</p>
+
+                {/* Media Preview */}
+                <div className="mb-2">
+                  {resource.resourceType === 'image' && (
+                    <img src={resource.content} alt="img" className="rounded-lg" />
+                  )}
+                  {resource.resourceType === 'video' && (
+                    <video controls className="w-full rounded-lg">
+                      <source src={resource.content} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
+                </div>
+
+                {/* Link */}
                 <a
-                  href={resource.link}
+                  href={resource.link || resource.content}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-600 hover:underline font-medium"
                 >
                   🔗 Access Resource
                 </a>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
           <p className="text-gray-600 text-lg">No resources available at the moment. Check back later!</p>
         )}
@@ -36,6 +61,5 @@ const Educationalresources = () => {
     </div>
   );
 };
-
 
 export default Educationalresources;

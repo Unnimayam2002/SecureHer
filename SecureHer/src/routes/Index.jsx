@@ -34,6 +34,9 @@ import Notificationpage from '../pages/Notificationpage';
 import Userprofilepage from '../pages/Userprofilepage';
 import Footer1page from '../pages/Footer1page';
 import Banner1page from '../pages/Banner1page';
+import Editprofilepage from '../pages/Editprofilepage';
+import Myreportspage from '../pages/Myreportspage';
+import Distresssignalpage from '../pages/Distresssignalpage';
 
 
 function Index() {
@@ -58,16 +61,20 @@ function Index() {
                   <Route path='/banner' element={<Bannerpage />} />
                   <Route path='/banner1' element={<Banner1page />} />
                   <Route path='/signup' element={<><Navbar /><Signuppage /><Footerpage /></>} />
-                  <Route path='/rtloc' element={<><Navbar1 /><Realtimelocationpage /><Footerpage /></>} />
+                  <Route path='/rtloc'
+                   element={<><Navbar1 /><Realtimelocationpage /><Footerpage /></>} />
                   <Route path='/coms' element={<><Navbar1 /><Communitysupportpage /><Footerpage /></>} />
                   <Route path='/comsview' element={<><Navbar1 /><Comspage /><Footerpage /></>} />
                   <Route path='/edures' element={<><Navbar1 /><Educationalresourcespage /><Footerpage /></>} />
                   <Route path='/saferoutes' element={<><Navbar1 /><Saferoutespage /><Footerpage /></>} />
                   <Route path='/anorep' element={<><Navbar1 /><Anonymousreportingpage /><Footerpage /></>} />
                   <Route path='/anorepview' element={<><Navbar1 /><Anoreppage /><Footerpage /></>} />
+                  <Route path='/myanorepview' element={<><Navbar1 /><Myreportspage /><Footerpage /></>} />
                   <Route path='/cusset' element={<><Navbar1 /><Customizablesettingspage /><Footerpage /></>} />
                   <Route path='/notification' element={<><Navbar1 /><Notificationpage /><Footerpage /></>} />
                   <Route path='/userprofile' element={<><Navbar1 /><Userprofilepage /><Footerpage /></>} />
+                  <Route path='/editprofile' element={<><Navbar1 /><Editprofilepage /><Footerpage /></>} />
+                  <Route path='/signal' element={<><Navbar1 /><Distresssignalpage/><Footerpage /></>} />
           </Routes>
           <Routes>
               <Route path='/admin'>

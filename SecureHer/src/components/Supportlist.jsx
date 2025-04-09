@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { 
-  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, FaPlusCircle, FaEye, FaSignOutAlt
+  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, FaPlusCircle, FaEye, FaSignOutAlt 
 } from "react-icons/fa";
-
-const initialSupportRequests = [
-  { id: 1, helper: "Alice Johnson", requester: "Jane Doe", district: "Downtown", location: "New York", supportType: "Medical Aid", supportDetails: "Needs immediate first aid and transport to hospital", status: "In Progress" },
-  { id: 2, helper: "Bob Smith", requester: "Mike Ross", district: "Westside", location: "Los Angeles", supportType: "Legal Assistance", supportDetails: "Requires legal advice for domestic issues", status: "Completed" },
-  { id: 3, helper: "Charlie Brown", requester: "Sarah Lee", district: "Uptown", location: "Chicago", supportType: "Counseling", supportDetails: "Seeks emotional support and counseling", status: "In Progress" }
-];
+import { admincomsViewAPI } from '../services/comsServices';
 
 const Supportlist = () => {
-  const [supportRequests, setSupportRequests] = useState(initialSupportRequests);
+  const { data: supportRequests = [], isLoading, isError } = useQuery({
+    queryKey: ['supportRequests'],
+    queryFn: admincomsViewAPI,
+  });
+  
   const [isEduresOpen, setIsEduresOpen] = useState(false);
-
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
 
   const handleLogout = () => {
     window.location.href = '/';
   };
+
+  if (isLoading) return <div className="p-6">Loading...</div>;
+  if (isError) return <div className="p-6 text-red-500">Failed to load support requests.</div>;
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -55,16 +59,37 @@ const Supportlist = () => {
       </aside>
 
       {/* Support Requests */}
+      
       <div className="flex-1 p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Community Support Requests</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {supportRequests.map((request) => (
-            <div key={request.id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
-              <p className="text-xl font-semibold text-gray-700">Name: {request.requester}</p>
-              <p className="text-gray-700">Helper: {request.helper}</p>
-              <p className="text-gray-700">District: {request.district}</p>
-              <p className="text-gray-700">Location: {request.location}</p>
-              <p className="text-gray-700">Support Details: {request.supportDetails}</p>
+          {supportRequests?.map((request) => (
+            <div key={request._id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
+              <p className="text-xl font-semibold text-gray-700">Name: {request.userId.username}</p>
+              {(request.supporter)&&(<p className="text-gray-700">Helper: {request.supporter.username}</p>)}
+              
+              <p className="text-lg font-semibold mt-2">
+                {typeof request.location === 'object' ? (
+                  <a
+                    href={`https://www.google.com/maps?q=${request.location.latitude},${request.location.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    View Location
+                  </a>
+                ) : (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(request.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    View Location
+                  </a>
+                )}
+              </p>
+              <p className="text-gray-700">Support Details: {request.requestDetails}</p>
               <p className={`text-sm font-bold ${request.status === 'Completed' ? 'text-green-500' : request.status === 'In Progress' ? 'text-blue-500' : 'text-yellow-500'}`}>Status: {request.status}</p>
             </div>
           ))}

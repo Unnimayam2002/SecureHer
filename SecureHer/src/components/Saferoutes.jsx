@@ -1,57 +1,68 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { FaMapMarkerAlt, FaRoute } from 'react-icons/fa';
+import { getReportAPI, safeRouteAPI } from '../services/saferouteServices';
 
-const keralaPlaces = [
-  'Thiruvananthapuram', 'Neyyattinkara', 'Varkala', 'Attingal',
-  'Kollam', 'Karunagappally', 'Punalur', 'Paravur',
-  'Pathanamthitta', 'Adoor', 'Ranni', 'Thiruvalla',
-  'Alappuzha', 'Cherthala', 'Kayamkulam', 'Mavelikkara',
-  'Kottayam', 'Changanassery', 'Vaikom', 'Pala',
-  'Idukki', 'Munnar', 'Thodupuzha', 'Kattappana',
-  'Ernakulam', 'Kochi', 'Aluva', 'Perumbavoor', 'Kothamangalam', 'Angamaly',
-  'Thrissur', 'Guruvayur', 'Chalakudy', 'Kunnamkulam', 'Irinjalakuda',
-  'Palakkad', 'Ottapalam', 'Shoranur', 'Mannarkkad', 'Alathur',
-  'Malappuram', 'Manjeri', 'Tirur', 'Perinthalmanna', 'Nilambur', 'Ponnani',
-  'Kozhikode', 'Koyilandy', 'Vadakara', 'Feroke', 'Ramanattukara',
-  'Wayanad', 'Kalpetta', 'Sulthan Bathery', 'Mananthavady',
-  'Kannur', 'Thalassery', 'Payyannur', 'Taliparamba', 'Mattannur',
-  'Kasaragod', 'Nileshwaram', 'Kanhangad', 'Bekal', 'Cheruvathur',
-  'Pattambi', 'Malappuram City', 'Kodungallur', 'Edappal', 'Valanchery',
-  'Vadakkancherry', 'Chavakkad', 'Parappanangadi', 'Tirurangadi', 'Kondotty',
-  'Kunnamangalam', 'Thamarassery', 'Nadapuram', 'Payyanur', 'Kuthuparamba',
-  'Pappinisseri', 'Iritty', 'Cherupuzha', 'Peravoor', 'Kudiyanmala'
-];
+const keralaPlaces = [/*... your existing place array ...*/];
+
+const getCoordinates = async (placeName) => {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(placeName)}`
+  );
+  const data = await response.json();
+  if (data.length === 0) throw new Error('Location not found');
+  return {
+    lat: parseFloat(data[0].lat),
+    lng: parseFloat(data[0].lon),
+  };
+};
 
 const Saferoutes = () => {
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
-  const [route, setRoute] = useState(null);
-  const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 });
-  const [currentDistrict, setCurrentDistrict] = useState('');
+  const [startCoords, setStartCoords] = useState(null);
+  const [endCoords, setEndCoords] = useState(null);
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          setCurrentLocation({ lat: latitude, lng: longitude });
+  const {
+    data: routeData,
+    refetch,
+    isFetching,
+    isError,
+  } = useQuery({
+    queryKey: ['safeRoute'],
+    queryFn: () =>
+      safeRouteAPI({
+        startLatitude: startCoords.lat,
+        startLongitude: startCoords.lng,
+        endLatitude: endCoords.lat,
+        endLongitude: endCoords.lng,
+      }),
+    enabled: false,
+  });
 
-          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-          const data = await response.json();
-          const district = data.address.state_district || data.address.county || 'Unknown District';
-          setCurrentDistrict(district);
-        },
-        (error) => console.error('Error fetching location:', error)
-      );
+  const {
+    data: reportData,
+  } = useQuery({
+    queryKey: ['reports'],
+    queryFn: getReportAPI,
+  });
+
+  const getSafeRoute = async () => {
+    try {
+      const startC = await getCoordinates(start);
+      const endC = await getCoordinates(end);
+
+      setStartCoords(startC);
+      setEndCoords(endC);
+
+      setTimeout(() => {
+        refetch();
+      }, 100);
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      alert('Error generating route. Please check locations and try again.');
     }
-  }, []);
-
-  const getSafeRoute = () => {
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(start)}&destination=${encodeURIComponent(end)}&travelmode=walking`;
-    setRoute(googleMapsUrl);
   };
-
-  const allPlaces = ['Current Location', currentDistrict, ...keralaPlaces];
 
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col items-center py-10">
@@ -70,7 +81,7 @@ const Saferoutes = () => {
                 placeholder="Choose starting location"
               />
               <datalist id="places">
-                {allPlaces.map((place, index) => (
+                {keralaPlaces.map((place, index) => (
                   <option key={index} value={place} />
                 ))}
               </datalist>
@@ -101,9 +112,13 @@ const Saferoutes = () => {
 
       <div className="mt-10 w-3/4">
         <h3 className="text-2xl font-bold text-green-900 mb-4">🗺️ Your Safe Route Map</h3>
-        {route ? (
+        {isFetching ? (
+          <p className="text-gray-500">Fetching route...</p>
+        ) : isError ? (
+          <p className="text-red-500">Failed to get safe route. Please try again.</p>
+        ) : routeData?.googleMapsUrl ? (
           <a
-            href={route}
+            href={routeData.googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 underline text-lg"
@@ -111,19 +126,99 @@ const Saferoutes = () => {
             Open Safe Route in Google Maps
           </a>
         ) : (
-          <iframe
-            title="Current Location Map"
-            src={`https://www.google.com/maps?q=${currentLocation.lat},${currentLocation.lng}&z=15&output=embed`}
-            width="100%"
-            height="500"
-            style={{ borderRadius: '16px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' }}
-            allowFullScreen
-            loading="lazy"
-          ></iframe>
+          <p className="text-gray-500">Select locations and generate route to view it here.</p>
         )}
       </div>
+
+      {/* Render the interactive map with route and incident markers */}
+      {startCoords && endCoords && reportData && (
+        <div className="mt-10 w-3/4">
+          <InlineSafeRouteMap
+            startCoords={startCoords}
+            endCoords={endCoords}
+            reportData={reportData}
+          />
+          
+        </div>
+      )}
     </div>
   );
 };
 
 export default Saferoutes;
+
+const InlineSafeRouteMap = ({ startCoords, endCoords, reportData }) => {
+  const mapRef = React.useRef(null);
+  const [map, setMap] = useState(null);
+
+  useEffect(() => {
+    if (!startCoords || !endCoords) return;
+  
+    const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!GOOGLE_MAPS_API_KEY) {
+      console.error('Missing Google Maps API key!');
+      return;
+    }
+  
+    const initMap = () => {
+      if (!mapRef.current) {
+        console.warn('Map container not yet mounted');
+        return;
+      }
+  
+      const mapInstance = new window.google.maps.Map(mapRef.current, {
+        center: startCoords,
+        zoom: 10,
+      });
+  
+      const directionsService = new window.google.maps.DirectionsService();
+      const directionsRenderer = new window.google.maps.DirectionsRenderer();
+      directionsRenderer.setMap(mapInstance);
+  
+      directionsService.route(
+        {
+          origin: startCoords,
+          destination: endCoords,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === 'OK') {
+            directionsRenderer.setDirections(result);
+          } else {
+            console.error('Directions request failed due to ' + status);
+          }
+        }
+      );
+  
+      // Report markers
+      reportData?.forEach((report) => {
+        new window.google.maps.Marker({
+          position: {
+            lat: parseFloat(report.latitude),
+            lng: parseFloat(report.longitude),
+          },
+          map: mapInstance,
+          icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+        });
+      });
+  
+      setMap(mapInstance);
+    };
+  
+    const loadGoogleMaps = () => {
+      if (!window.google && !document.querySelector('#googleMapsScript')) {
+        const script = document.createElement('script');
+        script.id = 'googleMapsScript';
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+        script.onload = initMap;
+        document.body.appendChild(script);
+      } else if (window.google) {
+        initMap();
+      }
+    };
+  
+    loadGoogleMaps();
+  }, [startCoords, endCoords, reportData]);
+}  

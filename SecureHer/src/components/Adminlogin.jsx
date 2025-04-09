@@ -2,10 +2,17 @@ import React from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { FaUser, FaLock } from "react-icons/fa";
+import { useMutation } from "@tanstack/react-query";
 
 const validationSchema = yup.object().shape({
-  username: yup.string().min(5, "Username must be at least 5 characters").required("Username is required"),
-  password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  username: yup
+    .string()
+    .min(5, "Username must be at least 5 characters")
+    .required("Username is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
 });
 
 function Adminlogin() {
@@ -87,7 +94,7 @@ function Adminlogin() {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg text-xl font-semibold"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg text-xl font-semibold cursor-pointer"
             >
               Login
             </button>

@@ -1,33 +1,60 @@
 import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaPlusCircle, FaEye, FaChevronDown, FaSignOutAlt } from "react-icons/fa";
+import { useMutation } from '@tanstack/react-query';
+import { addeduResAPI } from '../services/resourcesServices';
 
 const Addedures = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [resourceType, setResourceType] = useState('article');
-  const [file, setFile] = useState(null);
   const [isEduresOpen, setIsEduresOpen] = useState(false);
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!file) {
-      alert('Please upload a file');
-      return;
-    }
-    const newResource = { title, description, resourceType, fileName: file.name };
-    console.log('Resource added:', newResource);
-    alert('Educational resource added successfully!');
-    setTitle('');
-    setDescription('');
-    setResourceType('article');
-    setFile(null);
-  };
+  // Destructuring mutate function from useMutation hook
+  const { mutateAsync, isLoading, isError, isSuccess } = useMutation({
+    mutationFn: addeduResAPI,
+    mutationKey: ["Addedures"],
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      title: '',
+      description: '',
+      resourceType: 'image',
+      content: '',
+    },
+    validationSchema: Yup.object({
+      title: Yup.string().required('Title is required'),
+      description: Yup.string().required('Description is required'),
+      resourceType: Yup.string().oneOf(['image', 'video'], 'Invalid type').required('Resource type is required'),
+      content: Yup.mixed()
+  .required("Content is required")
+    }),
+    onSubmit: (values, { resetForm }) => {
+      console.log("Submitting form", values); 
+      const formData = new FormData();
+        formData.append("title", values.title);
+        formData.append("description", values.description);
+        formData.append("resourceType", values.resourceType);
+        formData.append("content", values.content);
+
+      mutateAsync(formData, {
+        onSuccess: () => {
+          alert('Educational resource added successfully!');
+          resetForm();
+        },
+        onError: () => {
+          alert('Failed to add resource. Please try again.');
+        },
+      });
+    },
+  });
+    
 
   const handleLogout = () => {
     window.location.href = '/';
   };
+  console.log(formik.errors);
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-100 to-purple-200 flex">
@@ -64,29 +91,35 @@ const Addedures = () => {
       </aside>
 
       <div className="flex-1 p-8 flex justify-center items-center">
-        <form onSubmit={handleSubmit} className="bg-white shadow-2xl rounded-3xl p-8 w-150 hover:shadow-2xl">
-          <h1 className="text-3xl font-extrabold mb-6 text-gray-800 text-center animate-pulse">Add Educational Resource</h1>
+      <form onSubmit={formik.handleSubmit} encType="multipart/form-data" className="bg-white shadow-2xl rounded-3xl p-8 w-150 hover:shadow-2xl">
+          <h1 className="text-3xl font-extrabold mb-6 text-gray-800 text-center">Add Educational Resource</h1>
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2">Title</label>
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter resource title" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200" required />
+            <input type="text" name="title" value={formik.values.title} onChange={formik.handleChange} placeholder="Enter resource title" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200" required />
+            {formik.errors.title && <p className="text-red-500 text-sm">{formik.errors.title}</p>}
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2">Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Provide a brief description" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200" required></textarea>
+            <textarea name="description" value={formik.values.description} onChange={formik.handleChange} placeholder="Provide a brief description" className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200" required></textarea>
+            {formik.errors.description && <p className="text-red-500 text-sm">{formik.errors.description}</p>}
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2">Resource Type</label>
-            <select value={resourceType} onChange={(e) => setResourceType(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200">
-              <option value="article">Article</option>
+            <select name="resourceType" value={formik.values.resourceType} onChange={formik.handleChange} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200">
+              <option value="image">Image</option>
               <option value="video">Video</option>
-              <option value="tutorial">Tutorial</option>
             </select>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2">Upload File</label>
-            <input type="file" onChange={(e) => setFile(e.target.files[0])} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200 cursor-pointer" required />
+            <input type="file" name="content" onChange={(event) => formik.setFieldValue('content', event.currentTarget.files[0])} />
+            {formik.errors.content && <p className="text-red-500 text-sm">{formik.errors.content}</p>}
           </div>
-          <button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-transform transform hover:scale-110 w-full cursor-pointer">Add Resource</button>
+          <button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-transform transform hover:scale-110 w-full cursor-pointer">
+            {isLoading ? "Adding..." : "Add Resource"}
+          </button>
+          {isError && <p className="text-red-500 text-sm mt-2">Failed to add resource. Try again.</p>}
+          {isSuccess && <p className="text-green-500 text-sm mt-2">Resource added successfully!</p>}
         </form>
       </div>
     </div>

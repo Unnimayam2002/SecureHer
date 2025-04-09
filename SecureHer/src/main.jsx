@@ -12,7 +12,7 @@ import './index.css'
 import App from './App.jsx'
 import { Provider } from 'react-redux'
 import { store } from './redux/Store.js'
-
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient()
 
@@ -21,6 +21,7 @@ createRoot(document.getElementById('root')).render(
   <Provider store={store}>
   <StrictMode>
     <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsopen={false}/>
     <App />
     </QueryClientProvider>
   </StrictMode>

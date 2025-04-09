@@ -1,41 +1,42 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
-import { getDecodedData, getUserData } from "../utils/storageHandler";
+import {createSlice} from '@reduxjs/toolkit'
+import { decodedData, getToken } from '../utils/storageHandler'
 
-export const userslice=createSlice({
-    name:'user',
-    initialState:{
-        isLogin:getUserData()?true : false,
-        token:getUserData() || null,
-        name:getDecodedData()?.name || null,
-        email:getDecodedData()?.email || null,
-        role:getDecodedData()?.role || null
-    },
-    reducers:{
-        signup(state){
-           state.isLogin = true,
-           state.token = token,
-           state.name = name,
-           state.email = email         
-        },
-        login:((state,action)=>{
-            // console.log(action.payload);
-            state.token = action.payload
-            const decoded = jwtDecode(action.payload)
-            console.log(decoded);
-            state.role = decoded.role,
-            state.isLogin = true,
-            state.name = decoded.name,
-            state.email = decoded.email
-        }),
-        logout(state){
-           state.isLogin = false,
-           state.token = null,
-           state.name = null,
-           state.email = null
-        }
+export const  userSlice= createSlice({
+  name:" userSlice",
+  initialState:{
+      name:decodedData()?.name || null,
+      id:decodedData()?.id || null,
+      role:decodedData()?.role || null,
+      email:decodedData()?.email || null,
+      isLogin:getToken() ? true : false
+  },
+  reducers:{
+      loginUserAction:((state,action)=>{
+         state.name = action.payload.name
+         state.email = action.payload.email
+         state.id = action.payload.id
+         state.role = action.payload.role
+         state.isLogin = true
+      }),
+      registerUserAction:((state,action)=>{
 
-    }
+        state.name = action.payload.name
+        state.email = action.payload.email
+        state.id = action.payload.id
+        state.role = action.payload.role
+        state.isLogin = true
+       
+      }),
+      logoutAction: (state, action) => {
+        state.name = null
+        state.email = null
+        state.id = null
+        state.role = null
+        state.isLogin = false
+      }
+  }
 })
-export const { signup, login, logout }=userslice.actions
-export default userslice.reducer
+
+export default  userSlice.reducer
+
+export const {loginUserAction,registerUserAction,logoutAction} =   userSlice.actions

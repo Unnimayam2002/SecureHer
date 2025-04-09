@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaBars, FaBell } from "react-icons/fa";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { signalAPI } from "../services/signalServices";
+import { useNavigate } from "react-router-dom";
+import {useDispatch} from 'react-redux'
+import { logoutAction } from "../redux/Userslice";
 
 const Navbar1 = ({ sendDistressSignal, isSending, distressNotification, handleLogout }) => {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isViewsOpen, setIsViewsOpen] = useState(false);
   const servicesRef = useRef(null);
   const viewsRef = useRef(null);
+
 
   const toggleServices = (e) => {
     e.preventDefault();
@@ -43,7 +49,7 @@ const Navbar1 = ({ sendDistressSignal, isSending, distressNotification, handleLo
             <img src="images/logo.png" alt="Logo" className="h-12" />
             <h1 className="text-2xl md:text-3xl font-bold text-white-400">SecureHer</h1>
           </div>
-          <nav className="hidden md:flex space-x-6">
+          <nav className="hidden md:flex space-x-6 z-50">
             <a href="/homepage" className="text-white hover:text-blue-400">Home</a>
             <a href="/about1" className="text-white hover:text-blue-400">About</a>
             <div className="relative" ref={servicesRef}>
@@ -57,10 +63,10 @@ const Navbar1 = ({ sendDistressSignal, isSending, distressNotification, handleLo
                 </button>
               </div>
               {isServicesOpen && (
-                <div className="absolute bg-white text-gray-900 rounded-lg shadow-lg mt-2 w-56">
-                  <a href="/rtloc" className="block px-4 py-2 hover:bg-blue-100">Location Tracking</a>
-                  <a href="/comsview" className="block px-4 py-2 hover:bg-blue-100">Community Support</a>
-                  <a href="/anorep" className="block px-4 py-2 hover:bg-blue-100">Incident Reporting</a>
+                <div className="absolute bg-black text-white-900 rounded-lg shadow-lg mt-2 w-56">
+                  <a href="/rtloc" className="block px-4 py-2 hover:bg-white-100">Location Tracking</a>
+                  <a href="/comsview" className="block px-4 py-2 hover:bg-white-100">Community Support</a>
+                  <a href="/anorep" className="block px-4 py-2 hover:bg-white-100">Incident Reporting</a>
                 </div>
               )}
             </div>
@@ -75,11 +81,12 @@ const Navbar1 = ({ sendDistressSignal, isSending, distressNotification, handleLo
                 </button>
               </div>
               {isViewsOpen && (
-                <div className="absolute bg-white text-gray-900 rounded-lg shadow-lg mt-2 w-56">
-                  <a href="/coms" className="block px-4 py-2 hover:bg-blue-100">Offer Support</a>
-                  <a href="/anorepview" className="block px-4 py-2 hover:bg-blue-100">Reports</a>
-                  <a href="/edures" className="block px-4 py-2 hover:bg-blue-100">Educational Resources</a>
-                  <a href="/saferoutes" className="block px-4 py-2 hover:bg-blue-100">Safe Routes</a>
+                <div className="absolute bg-black text-white-900 rounded-lg shadow-lg mt-2 w-56">
+                  <a href="/coms" className="block px-4 py-2 hover:bg-white-100">Offer Support</a>
+                  <a href="/anorepview" className="block px-4 py-2 hover:bg-white-100">Reports</a>
+                  <a href="/edures" className="block px-4 py-2 hover:bg-white-100">Educational Resources</a>
+                  <a href="/saferoutes" className="block px-4 py-2 hover:bg-white-100">Safe Routes</a>
+                  <a href="/signal" className="block px-4 py-2 hover:bg-white-100">Distress Signals</a>
                 </div>
               )}
             </div>
@@ -115,54 +122,55 @@ const Navbar1 = ({ sendDistressSignal, isSending, distressNotification, handleLo
 };
 
 const Distresssignal = () => {
-  const [isSending, setIsSending] = useState(false);
+  const queryClient = useQueryClient()
   const [distressNotification, setDistressNotification] = useState(0);
-
+  const navigate = useNavigate();
+  const mutation = useMutation({
+    mutationFn: signalAPI,
+    onSuccess: (data) => {
+  alert("🚨 Distress signal sent successfully!");
+  queryClient.invalidateQueries({queryKey:['distress-signals']})
+  },
+    onError: () => {
+      alert("❌ Failed to send distress signal. Please try again.");
+    },
+  });
+ 
   const sendDistressSignal = async () => {
     try {
-      setIsSending(true);
       const location = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           (position) => resolve({
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
           }),
           (error) => reject(error)
         );
       });
 
       const distressData = {
-        message: '🚨 Distress Signal! I need help!',
+        message: "🚨 Distress Signal! I need help!",
         location: `${location.lat}, ${location.lng}`,
-        timestamp: new Date().toLocaleString()
+        timestamp: new Date().toLocaleString(),
       };
 
-      console.log('Sending distress signal:', distressData);
-
-      await fetch('/api/distress-signal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(distressData)
-      });
-
-      alert('🚨 Distress signal sent successfully!');
-      setDistressNotification((prev) => prev + 1);
+      mutation.mutate(distressData);
     } catch (error) {
-      console.error('Failed to send distress signal:', error);
-      alert('❌ Failed to send distress signal. Please try again.');
-    } finally {
-      setIsSending(false);
+      console.error("Failed to get location:", error);
+      alert("❌ Failed to retrieve location. Please enable location access.");
     }
   };
-
+const dispatch=useDispatch()
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/';
+    sessionStorage.removeItem("token");
+    dispatch(logoutAction()) 
+    sessionStorage.clear();
+    window.location.href = "/";
   };
 
   return (
     <div>
-      <Navbar1 sendDistressSignal={sendDistressSignal} isSending={isSending} distressNotification={distressNotification} handleLogout={handleLogout} />
+      <Navbar1 sendDistressSignal={sendDistressSignal} isSending={mutation.isLoading} distressNotification={distressNotification} handleLogout={handleLogout} />
     </div>
   );
 };

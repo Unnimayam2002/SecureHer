@@ -1,1 +1,1 @@
-export const BASE_URL="http://localhost:2008/api/v1"
+export const BASE_URL="http://localhost:5000"

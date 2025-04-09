@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import {useDispatch} from 'react-redux'
 import { 
   FaUsers, FaBell, FaBook, FaRoute, 
   FaExclamationTriangle, FaChartBar, FaChevronDown, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaPlusCircle, FaEye, FaSignOutAlt
 } from "react-icons/fa";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { logoutAction } from "../redux/Userslice";
 
 const dashboardStats = [
   { title: "Total Users", count: 1245, icon: <FaUsers className="text-blue-500 text-3xl" /> },
@@ -35,9 +37,11 @@ const Admindashboard = () => {
   const [isEduresOpen, setIsEduresOpen] = useState(false);
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
-
+const dispatch=useDispatch()
   const handleLogout = () => {
     console.log("Logging out...");
+    dispatch(logoutAction())
+    sessionStorage.clear()
     window.location.href = "/";
   };
 

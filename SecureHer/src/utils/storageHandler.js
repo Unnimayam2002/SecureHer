@@ -1,9 +1,10 @@
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from 'jwt-decode'
 
-export const getUserData = ()=>{
-    return localStorage.getItem("userData") ? localStorage.getItem("userData") : null
+
+export const getToken = ()=>{
+    return sessionStorage.getItem("userToken") ? sessionStorage.getItem("userToken") :null
 }
 
-export const getDecodedData = ()=>{
-    return localStorage.getItem("userData") ? jwtDecode(localStorage.getItem("userData")) : null
+export const decodedData = ()=>{
+    return getToken() ? jwtDecode(getToken()) : null
 }

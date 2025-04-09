@@ -1,34 +1,65 @@
 import React from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { distressSignalAPI } from '../services/signalServices';
+import { markAsReadAPI } from '../services/notificationServices';
 
 function Notification() {
-  const distressSignals = [
-    { id: 1, name: "Aisha Khan", location: "Central Park, NY", coordinates: { lat: 40.785091, lng: -73.968285 }, time: "2025-03-09 14:23", signalPassed: true },
-    { id: 2, name: "Meera Patel", location: "5th Avenue, NY", coordinates: { lat: 40.775036, lng: -73.965635 }, time: "2025-03-09 15:45", signalPassed: false }
-  ];
+  const queryClient = useQueryClient();
+  const { data: distressSignals, isLoading, error } = useQuery({
+    queryKey: ['distressSignals'],
+    queryFn: distressSignalAPI,
+  });
+
+  const markAsReadMutation = useMutation({
+    mutationFn: (id) => markAsReadAPI({ id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['distressSignals']);
+    },
+  });
 
   const openLocation = (coordinates) => {
     const url = `https://www.google.com/maps?q=${coordinates.lat},${coordinates.lng}`;
     window.open(url, '_blank');
   };
 
+  if (isLoading) return <p className="text-center">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">Error loading distress signals.</p>;
+
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Distress Signals</h1>
+    <div className="min-h-screen bg-gray-100 p-4  pt-21">
+      <h1 className="text-3xl font-bold mb-6 text-center ">Notifications</h1>
       <div className="grid grid-cols-1 gap-4">
-        {distressSignals.filter(signal => signal.signalPassed).map((signal) => (
-          <div key={signal.id} className="bg-white rounded-2xl shadow-lg p-4">
+        {distressSignals?.map((signal) => (
+          <div key={signal._id} className="bg-white p-4 rounded-2xl shadow-xl transition transform hover:scale-105 hover:shadow-2xl">
             <h2 className="text-xl font-semibold">{signal.name}</h2>
-            <p className="text-gray-600">Location: {signal.location}</p>
-            <p className="text-gray-600">Time: {signal.time}</p>
+            <p className="text-gray-600 mb-1"><span className="font-medium">Message: 📍{signal.message}</span></p>
+            <p className="text-gray-600">Time: ⏰{signal.date ? new Date(signal.date).toLocaleString() : 'N/A'}</p>
+
             <button
-              onClick={() => openLocation(signal.coordinates)}
-              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 cursor-pointer"
+              onClick={() => markAsReadMutation.mutate(signal._id)}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition duration-300 ease-in-out"
             >
-              📍 View Location
+              ✅ Mark as read
             </button>
           </div>
         ))}
       </div>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fadeInUp 0.5s ease forwards;
+        }
+      `}</style>
     </div>
   );
 }

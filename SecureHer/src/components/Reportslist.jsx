@@ -1,27 +1,36 @@
 import React, { useState } from 'react';
-import { FaChartBar, FaChevronDown, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaPlusCircle, FaEye, FaSignOutAlt } from "react-icons/fa";
-
-const initialReports = [
-  { id: 1, reporter: "Anonymous", reportType: "Harassment", incidentDetails: "Verbal harassment reported near central park", district: "Downtown", location: "New York" },
-  { id: 2, reporter: "Emily White", reportType: "Theft", incidentDetails: "Stolen belongings from a parked car", district: "Westside", location: "Los Angeles" },
-  { id: 3, reporter: "Anonymous", reportType: "Assault", incidentDetails: "Physical altercation witnessed near shopping mall", district: "Uptown", location: "Chicago" }
-];
+import { useQuery } from '@tanstack/react-query';
+import {
+  FaChartBar,
+  FaChevronDown,
+  FaUser,
+  FaSignal,
+  FaHandsHelping,
+  FaFileAlt,
+  FaBook,
+  FaPlusCircle,
+  FaEye,
+  FaSignOutAlt
+} from "react-icons/fa";
+import { adminreportviewAPI } from '../services/reportServices';
 
 const Reportslist = () => {
-  const [reports, setReports] = useState(initialReports);
   const [searchTerm, setSearchTerm] = useState('');
   const [isEduresOpen, setIsEduresOpen] = useState(false);
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
-
   const handleLogout = () => {
     window.location.href = '/';
   };
 
+  const { data: reports = [], isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: adminreportviewAPI
+  });
+
   const filteredReports = reports.filter(report =>
     report.reportType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.district.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.location.toLowerCase().includes(searchTerm.toLowerCase())
+    report.place.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -34,19 +43,48 @@ const Reportslist = () => {
         </div>
         <nav>
           <ul className="space-y-6 text-md">
-            <li><a href="/admin/admin-dashboard" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaChartBar /> <span>Dashboard</span></a></li>
-            <li><a href="/admin/userlist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaUser /> <span>Users</span></a></li>
-            <li><a href="/admin/signallist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaSignal /> <span>Distress Signals</span></a></li>
-            <li><a href="/admin/supportlist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaHandsHelping /> <span>Community Support</span></a></li>
-            <li><a href="/admin/reportslist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaFileAlt /> <span>Reports</span></a></li>
+            <li>
+              <a href="/admin/admin-dashboard" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer">
+                <FaChartBar /> <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/userlist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer">
+                <FaUser /> <span>Users</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/signallist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer">
+                <FaSignal /> <span>Distress Signals</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/supportlist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer">
+                <FaHandsHelping /> <span>Community Support</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin/reportslist" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer">
+                <FaFileAlt /> <span>Reports</span>
+              </a>
+            </li>
             <li>
               <div onClick={toggleEdures} className="flex items-center space-x-2 cursor-pointer hover:text-blue-400">
-                <FaBook /> <span>Educational Resources</span> <FaChevronDown className={`${isEduresOpen ? 'rotate-180' : ''} transition-transform`} />
+                <FaBook /> <span>Educational Resources</span>
+                <FaChevronDown className={`${isEduresOpen ? 'rotate-180' : ''} transition-transform`} />
               </div>
               {isEduresOpen && (
                 <ul className="pl-6 space-y-4">
-                  <li><a href="/admin/addedures" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaPlusCircle /> <span>Add Resource</span></a></li>
-                  <li><a href="/admin/viewedures" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer"><FaEye /> <span>View Resources</span></a></li>
+                  <li>
+                    <a href="/admin/addedures" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer">
+                      <FaPlusCircle /> <span>Add Resource</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/admin/viewedures" className="flex items-center space-x-2 hover:text-blue-400 cursor-pointer">
+                      <FaEye /> <span>View Resources</span>
+                    </a>
+                  </li>
                 </ul>
               )}
             </li>
@@ -69,20 +107,46 @@ const Reportslist = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-4 py-2 mb-6 border rounded-lg focus:ring-2 focus:ring-blue-400 transition duration-200"
         />
-        <div className="space-y-4">
-          {filteredReports.length > 0 ? (
-            filteredReports.map((report) => (
-              <div key={report.id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
-                <h2 className="text-xl font-semibold text-gray-700">{report.reportType} reported by {report.reporter}</h2>
-                <p className="text-gray-700">Incident Details: {report.incidentDetails}</p>
-                <p className="text-gray-700">District: {report.district}</p>
-                <p className="text-gray-700">Location: {report.location}</p>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-700 text-center">No incidents found.</p>
-          )}
-        </div>
+        {isLoading ? (
+          <p className="text-gray-700 text-center">Loading reports...</p>
+        ) : error ? (
+          <p className="text-black-500 text-center">Failed to load reports.</p>
+        ) : (
+          <div className="space-y-4">
+            {filteredReports.length > 0 ? (
+              filteredReports.map((report) => {
+                const latitude = report.location?.latitude || 0;
+                const longitude = report.location?.longitude || 0;
+                return (
+                  <div key={report._id} className="bg-white shadow-lg rounded-2xl p-6 transform transition duration-500 hover:scale-105">
+                    <h2 className="text-2xl font-semibold text-black-600">{report.reportType}</h2>
+                    <p className="text-gray-900 mt-4">
+                      <strong className="text-black-700">Incident Details:</strong> {report.incidentDetails}
+                    </p>
+                    <p className="text-gray-900 mt-2">
+                      <strong className="text-black-700">Location:</strong> {report?.place}
+                      <a
+                        href={`https://www.google.com/maps?q=${latitude},${longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black-700 underline ml-2"
+                      >
+                        View on Map
+                      </a>
+                    </p>
+                    {!report.anonymous && (
+                      <p className="text-gray-900 mt-2">
+                        <strong className="text-black-700">Reporter:</strong> {report.userId?.username}
+                      </p>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-gray-700 text-center">No incidents found.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

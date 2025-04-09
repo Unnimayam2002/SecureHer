@@ -2,55 +2,80 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { FaUser, FaLock, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCity } from 'react-icons/fa';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { registerAPI } from '../services/userServices';
+import { jwtDecode } from 'jwt-decode';
+import { registerUserAction } from '../redux/Userslice'
 
 const validationSchema = yup.object().shape({
-  name: yup.string().min(5, 'Please enter a name with at least 5 characters').required('Full name is required'),
+  username: yup.string().min(5, 'Please enter a name with at least 5 characters').required('Full name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
   phone: yup.string().matches(/^\d{10}$/, 'Phone number must be exactly 10 digits').required('Phone number is required'),
-  district: yup.string().required('District is required'),
-  location: yup.string().required('Location is required'),
+  
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
 });
 
 function Signup() {
+  const { mutateAsync, isLoading, isError, error } = useMutation({
+    mutationFn: registerAPI,
+    mutationKey: ["Userregister"],
+  
+  });
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const formik = useFormik({
     initialValues: {
-      name: '',
+      username: '',
       email: '',
       phone: '',
-      district: '',
-      location: '',
       password: '',
     },
     validationSchema,
-    onSubmit: async (values) => {
-      console.log('Signup Data', values);
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        const token = await mutateAsync(values);   
+        sessionStorage.setItem("userToken", token);
+        const decodedData = jwtDecode(token);
+        dispatch(registerUserAction(decodedData));
+        
+          resetForm();
+          navigate("/homepage");
+        
+      } catch (error) {
+        console.error("Signup Error:", error);
+      }
     },
-  });
+});
+
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-bg.jpg')" }}>
-   <div className="flex flex-col bg-white/10 backdrop-blur-lg rounded-xl shadow-lg w-full max-w-xl p-6">
-    <h2 className="text-3xl font-bold text-center text-gray-900 mb-6">Create an Account</h2>
-    <form onSubmit={formik.handleSubmit}>
-
+      <div className="flex flex-col bg-white/10 backdrop-blur-lg rounded-xl shadow-lg w-full max-w-sm p-6 mr-15">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-6">Create an Account</h2>
+        {isError && <p className="text-red-500 text-center">{error.message}</p>}
+        <form onSubmit={formik.handleSubmit}>
+          
           {/* Full Name */}
           <div className="mb-4 relative">
-            <label className="block text-gray-900 font-medium">Full Name</label>
+            <label className="block text-gray-900 font-medium">Username</label>
             <div className="relative flex items-center">
               <FaUser className="absolute left-3 text-gray-600" />
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formik.values.name}
+                id="username"
+                name="username"
+                value={formik.values.username}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 className="w-full pl-10 pr-3 py-2 bg-white/40 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-purple-300"
-                placeholder="Enter your name"
+                placeholder="Enter the username"
               />
             </div>
-            {formik.touched.name && formik.errors.name && <p className="text-red-500 text-sm mt-1">{formik.errors.name}</p>}
+            {formik.touched.username && formik.errors.username && <p className="text-red-500 text-sm mt-1">{formik.errors.username}</p>}
           </div>
 
           {/* Email */}
@@ -91,43 +116,7 @@ function Signup() {
             {formik.touched.phone && formik.errors.phone && <p className="text-red-500 text-sm mt-1">{formik.errors.phone}</p>}
           </div>
 
-          {/* District */}
-          <div className="mb-4 relative">
-            <label className="block text-gray-900 font-medium">District</label>
-            <div className="relative flex items-center">
-              <FaCity className="absolute left-3 text-gray-600" />
-              <input
-                type="text"
-                id="district"
-                name="district"
-                value={formik.values.district}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="w-full pl-10 pr-3 py-2 bg-white/40 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-purple-300"
-                placeholder="Enter your district"
-              />
-            </div>
-            {formik.touched.district && formik.errors.district && <p className="text-red-500 text-sm mt-1">{formik.errors.district}</p>}
-          </div>
-
-          {/* Location */}
-          <div className="mb-4 relative">
-            <label className="block text-gray-900 font-medium">Location</label>
-            <div className="relative flex items-center">
-              <FaMapMarkerAlt className="absolute left-3 text-gray-600" />
-              <input
-                type="text"
-                id="location"
-                name="location"
-                value={formik.values.location}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className="w-full pl-10 pr-3 py-2 bg-white/40 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-purple-300"
-                placeholder="Enter your location"
-              />
-            </div>
-            {formik.touched.location && formik.errors.location && <p className="text-red-500 text-sm mt-1">{formik.errors.location}</p>}
-          </div>
+          
 
           {/* Password */}
           <div className="mb-4 relative">
@@ -151,9 +140,10 @@ function Signup() {
           {/* Submit Button */}
           <button
             type="submit"
+            disabled={isLoading}
             className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition duration-300 shadow-md text-lg cursor-pointer"
           >
-            Sign Up
+            {isLoading ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
 

@@ -1,27 +1,57 @@
 import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { viewUserAPI, verifyUserAPI } from '../services/userServices';
 import { 
-  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, FaPlusCircle, FaEye, FaSignOutAlt
+  FaChartBar, FaUser, FaSignal, FaHandsHelping, FaFileAlt, FaBook, FaChevronDown, 
+  FaPlusCircle, FaEye, FaSignOutAlt 
 } from "react-icons/fa";
 
-const initialUsers = [
-  { id: 1, name: "Alice Johnson", district: "Downtown", location: "New York", email: "alice.johnson@example.com", phone: "123-456-7890" },
-  { id: 2, name: "Bob Smith", district: "Westside", location: "Los Angeles", email: "bob.smith@example.com", phone: "987-654-3210" },
-  { id: 3, name: "Charlie Brown", district: "Uptown", location: "Chicago", email: "charlie.brown@example.com", phone: "555-555-5555" }
-];
-
 const Userlist = () => {
-  const [users, setUsers] = useState(initialUsers);
   const [isEduresOpen, setIsEduresOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Fetch users
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: viewUserAPI,
+  });
+
+  // Optimistic update mutation
+  const mutation = useMutation({
+    mutationFn: verifyUserAPI,
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries(['users']);
+
+      const previousUsers = queryClient.getQueryData(['users']);
+
+      queryClient.setQueryData(['users'], (oldData) => {
+        return {
+          ...oldData,
+          userCount: oldData.userCount.filter(user => user._id !== newData.id)
+        };
+      });
+
+      return { previousUsers };
+    },
+    onError: (error, newData, context) => {
+      queryClient.setQueryData(['users'], context.previousUsers);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries(['users']);
+    }
+  });
+
+  const users = data?.userCount || [];
 
   const toggleEdures = () => setIsEduresOpen(!isEduresOpen);
 
   const handleVerify = (id) => {
-    alert(`User with ID ${id} has been verified.`);
+    mutation.mutate({ id: id, status: 'approved' });
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
-      setUsers(users.filter(user => user.id !== id));
+      mutation.mutate({ id: id, status: 'rejected' });
     }
   };
 
@@ -29,6 +59,9 @@ const Userlist = () => {
     console.log("Logging out...");
     window.location.href = "/";
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading users.</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -65,7 +98,7 @@ const Userlist = () => {
         </nav>
       </aside>
 
-      {/* Users Table */}
+      {/* Main Content */}
       <div className="flex-1 p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Users List</h1>
         <div className="bg-white shadow-lg rounded-2xl overflow-hidden">
@@ -73,7 +106,6 @@ const Userlist = () => {
             <thead className="bg-gradient-to-r from-gray-900 to-gray-700 text-white">
               <tr>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">Name</th>
-                <th className="py-3 px-6 text-left uppercase tracking-wider">District</th>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">Location</th>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">Email</th>
                 <th className="py-3 px-6 text-left uppercase tracking-wider">Phone</th>
@@ -81,26 +113,27 @@ const Userlist = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-b bg-gray-50 hover:bg-blue-50 transition duration-300">
-                  <td className="py-3 px-6 font-medium text-gray-800">{user.name}</td>
-                  <td className="py-3 px-6 text-gray-700">{user.district}</td>
-                  <td className="py-3 px-6 text-gray-700">{user.location}</td>
+              {users?.map((user) => (
+                <tr key={user._id} className="border-b bg-gray-50 hover:bg-blue-50 transition duration-300">
+                  <td className="py-3 px-6 font-medium text-gray-800">{user.username}</td>
+                  <td className="py-3 px-6 text-gray-700">
+                    {typeof user.location === "object" ? (
+                      <a href={`https://www.google.com/maps?q=${user.location.latitude},${user.location.longitude}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Location</a>
+                    ) : (
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(user.location)}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Location</a>
+                    )}
+                  </td>
                   <td className="py-3 px-6 text-gray-700">{user.email}</td>
                   <td className="py-3 px-6 text-gray-700">{user.phone}</td>
                   <td className="py-3 px-6 flex space-x-2">
-                    <button
-                      onClick={() => handleVerify(user.id)}
-                      className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transform transition duration-200 hover:scale-105"
-                    >
-                      Verify
-                    </button>
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transform transition duration-200 hover:scale-105"
-                    >
-                      Delete
-                    </button>
+                    {user.verified ? (
+                      <p className="text-green-600 font-semibold">Verified</p>
+                    ) : (
+                      <>
+                        <button onClick={() => handleVerify(user._id)} className="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transform transition duration-200 hover:scale-105">Verify</button>
+                        <button onClick={() => handleDelete(user._id)} className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transform transition duration-200 hover:scale-105">Delete</button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
